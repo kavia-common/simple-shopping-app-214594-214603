@@ -10,19 +10,19 @@ export default Blits.Component('ProductCard', {
       <Element x="16" y="16" :effects="$radiusMd">
         <Rect :w="$innerW" h="180" :color="$bgGradient"/>
         <Element :x="$innerCenterX" y="16" :mount="$mountCenterX">
-          <Image :src="$product?.image" w="180" h="140" />
+          <Image :src="$productImage" w="180" h="140" />
         </Element>
         <Element x="12" y="136" :effects="$pillRadius">
           <Rect w="120" h="32" :color="$primaryColor"/>
-          <Element x="12" y="4"><Text size="22" color="#fff" :content="$product?.tag || ''"/></Element>
+          <Element x="12" y="4"><Text size="22" color="#fff" :content="$productTag"/></Element>
         </Element>
       </Element>
 
       <Element x="20" y="212">
-        <Text size="28" :color="$textColor" :content="$product?.name || ''" />
+        <Text size="28" :color="$textColor" :content="$productName" />
       </Element>
       <Element x="20" y="252" w="340">
-        <Text size="22" :color="$mutedText" :content="$product?.description || ''" lineheight="28" maxwidth="340" />
+        <Text size="22" :color="$mutedText" :content="$productDescription" lineheight="28" maxwidth="340" />
       </Element>
       <Element x="20" y="324">
         <Text size="26" :color="$primaryColor" :content="$priceLabel" />
@@ -71,10 +71,12 @@ export default Blits.Component('ProductCard', {
       errorColor: Theme.colors.error,
       bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
       shadowMd: { blur: Theme.elevation.md, color: Theme.colors.shadow, spread: 0 },
-      radiusLg: [this.$shader('radius', { radius: Theme.radii.lg })],
-      radiusMd: [this.$shader('radius', { radius: Theme.radii.md })],
-      radiusSm: [this.$shader('radius', { radius: Theme.radii.sm })],
-      pillRadius: [this.$shader('radius', { radius: 999 })],
+
+      // effects to be initialized in ready()
+      radiusLg: null,
+      radiusMd: null,
+      radiusSm: null,
+      pillRadius: null,
       alphaTransition: { value: 0.98, duration: 250 },
 
       // mount strings
@@ -82,9 +84,17 @@ export default Blits.Component('ProductCard', {
       mountCenterX: 'x:0.5',
     }
   },
+  hooks: {
+    ready() {
+      this.radiusLg = [this.$shader('radius', { radius: Theme.radii.lg })]
+      this.radiusMd = [this.$shader('radius', { radius: Theme.radii.md })]
+      this.radiusSm = [this.$shader('radius', { radius: Theme.radii.sm })]
+      this.pillRadius = [this.$shader('radius', { radius: 999 })]
+    },
+  },
   computed: {
     priceLabel() {
-      const p = this.product?.price
+      const p = this.product ? this.product.price : null
       const val = p != null ? Number(p) : 0
       return `$${val.toFixed(2)}`
     },
@@ -93,6 +103,18 @@ export default Blits.Component('ProductCard', {
     },
     innerCenterX() {
       return (this.cardW - 32) / 2
+    },
+    productName() {
+      return this.product && this.product.name ? this.product.name : ''
+    },
+    productDescription() {
+      return this.product && this.product.description ? this.product.description : ''
+    },
+    productTag() {
+      return this.product && this.product.tag ? this.product.tag : ''
+    },
+    productImage() {
+      return this.product && this.product.image ? this.product.image : ''
     },
   },
   methods: {

@@ -15,29 +15,29 @@ export default Blits.Component('CartPanel', {
         <For :each="$entries" let="i">
           <Element :y="$rowY(i)" :effects="$radiusMdRef">
             <Rect :w="$rowW" h="70" :color="$backgroundColor" />
-            <Image :src="$entries[i].image" x="10" y="10" w="50" h="50" />
-            <Element x="70" y="12"><Text size="24" :color="$textColor" :content="$entries[i].name"/></Element>
-            <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$entries[i].priceLabel"/></Element>
+            <Image :src="$entryImage(i)" x="10" y="10" w="50" h="50" />
+            <Element x="70" y="12"><Text size="24" :color="$textColor" :content="$entryName(i)"/></Element>
+            <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$entryPriceLabel(i)"/></Element>
 
             <Element :mount="$mountRight" :x="$qtyLeftX" y="18" :effects="$radiusSmRef">
               <Rect w="32" h="32" :color="$errorColor" />
-              <Text x="9" y="5" size="24" color="#fff" content="-" @enter="$dec($entries[i])"/>
+              <Text x="9" y="5" size="24" color="#fff" content="-" @enter="$decByIndex(i)"/>
             </Element>
             <Element :mount="$mountRight" :x="$qtyCenterX" y="22">
-              <Text size="24" :color="$textColor" :content="$entries[i].quantity"/>
+              <Text size="24" :color="$textColor" :content="$entryQuantity(i)"/>
             </Element>
             <Element :mount="$mountRight" :x="$qtyRightX" y="18" :effects="$radiusSmRef">
               <Rect w="32" h="32" :color="$secondaryColor" />
-              <Text x="9" y="5" size="24" color="#fff" content="+" @enter="$inc($entries[i])"/>
+              <Text x="9" y="5" size="24" color="#fff" content="+" @enter="$incByIndex(i)"/>
             </Element>
 
-            <Element :mount="$mountRight" :x="$removeX" y="18" :effects="$radiusSmRef" @enter="$remove($entries[i])">
+            <Element :mount="$mountRight" :x="$removeX" y="18" :effects="$radiusSmRef" @enter="$removeByIndex(i)">
               <Rect w="32" h="32" :color="$errorColor" />
               <Text x="6" y="5" size="22" color="#fff" content="x"/>
             </Element>
 
             <Element :mount="$mountRight" :x="$lineTotalX" y="48">
-              <Text size="20" :color="$primaryColor" :content="$entries[i].lineTotalLabel"/>
+              <Text size="20" :color="$primaryColor" :content="$entryLineTotalLabel(i)"/>
             </Element>
           </Element>
         </For>
@@ -177,19 +177,58 @@ export default Blits.Component('CartPanel', {
       return i * 80
     },
     // PUBLIC_INTERFACE
-    $inc(item) {
-      /** Increase quantity for an entry. */
-      cartStore.update(item.id, item.quantity + 1)
+    $entryAt(i) {
+      /** Safely return entry by index or null. */
+      return Array.isArray(this.entries) ? this.entries[i] || null : null
     },
     // PUBLIC_INTERFACE
-    $dec(item) {
-      /** Decrease quantity for an entry (removes if zero). */
-      cartStore.update(item.id, item.quantity - 1)
+    $entryId(i) {
+      /** Get entry id by index. */
+      return this.$entryAt(i)?.id
     },
     // PUBLIC_INTERFACE
-    $remove(item) {
-      /** Remove an entry from the cart. */
-      cartStore.remove(item.id)
+    $entryQuantity(i) {
+      /** Get entry quantity label by index. */
+      const q = this.$entryAt(i)?.quantity || 0
+      return String(q)
+    },
+    // PUBLIC_INTERFACE
+    $entryName(i) {
+      /** Get entry name by index. */
+      return this.$entryAt(i)?.name || ''
+    },
+    // PUBLIC_INTERFACE
+    $entryImage(i) {
+      /** Get entry image by index. */
+      return this.$entryAt(i)?.image || ''
+    },
+    // PUBLIC_INTERFACE
+    $entryPriceLabel(i) {
+      /** Get entry price label by index. */
+      return this.$entryAt(i)?.priceLabel || ''
+    },
+    // PUBLIC_INTERFACE
+    $entryLineTotalLabel(i) {
+      /** Get entry line total label by index. */
+      return this.$entryAt(i)?.lineTotalLabel || ''
+    },
+    // PUBLIC_INTERFACE
+    $incByIndex(i) {
+      /** Increase quantity for an entry by index. */
+      const e = this.$entryAt(i)
+      if (e) cartStore.update(e.id, e.quantity + 1)
+    },
+    // PUBLIC_INTERFACE
+    $decByIndex(i) {
+      /** Decrease quantity for an entry by index (removes if zero). */
+      const e = this.$entryAt(i)
+      if (e) cartStore.update(e.id, e.quantity - 1)
+    },
+    // PUBLIC_INTERFACE
+    $removeByIndex(i) {
+      /** Remove an entry by index. */
+      const id = this.$entryId(i)
+      if (id) cartStore.remove(id)
     },
     // PUBLIC_INTERFACE
     $clear() {

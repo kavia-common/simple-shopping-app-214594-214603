@@ -33,10 +33,15 @@ export default Blits.Component('Header', {
       primaryColor: Theme.colors.primary,
       bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
       shadowSm: { blur: Theme.elevation.sm, color: Theme.colors.shadow, spread: 0 },
-      radiusLg: [this.$shader('radius', { radius: Theme.radii.lg })],
+      radiusLg: null,
 
       mountRight: 'x:1',
     }
+  },
+  hooks: {
+    ready() {
+      this.radiusLg = [this.$shader('radius', { radius: Theme.radii.lg })]
+    },
   },
   computed: {
     itemsLabel() {
