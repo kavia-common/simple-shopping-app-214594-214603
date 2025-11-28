@@ -17,7 +17,7 @@ export default Blits.Component('CartPanel', {
             <Rect :w="$rowW" h="70" :color="$backgroundColor" />
             <Image :src="$entries[i].image" x="10" y="10" w="50" h="50" />
             <Element x="70" y="12"><Text size="24" :color="$textColor" :content="$entries[i].name"/></Element>
-            <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$formatPrice($entries[i].price)"/></Element>
+            <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$entries[i].priceLabel"/></Element>
 
             <Element :mount="$mountRight" :x="$qtyLeftX" y="18" :effects="$radiusSmRef">
               <Rect w="32" h="32" :color="$errorColor" />
@@ -37,7 +37,7 @@ export default Blits.Component('CartPanel', {
             </Element>
 
             <Element :mount="$mountRight" :x="$lineTotalX" y="48">
-              <Text size="20" :color="$primaryColor" :content="$formatTotal($entries[i].price, $entries[i].quantity)"/>
+              <Text size="20" :color="$primaryColor" :content="$entries[i].lineTotalLabel"/>
             </Element>
           </Element>
         </For>
@@ -85,7 +85,6 @@ export default Blits.Component('CartPanel', {
       entries: [],
       total: 0,
       showConfirm: false,
-
 
       // theme bindings
       surfaceColor: Theme.colors.surface,
@@ -141,11 +140,20 @@ export default Blits.Component('CartPanel', {
       this.radiusSmRef = [this.$shader('radius', { radius: Theme.radii.sm })]
 
       this.unsubscribe = cartStore.subscribe((snap) => {
-        this.entries = snap.entries
+        // enrich entries with precomputed labels to avoid calling methods in template bindings
+        this.entries = (snap.entries || []).map((e) => ({
+          ...e,
+          priceLabel: '$' + Number(e.price).toFixed(2),
+          lineTotalLabel: '$' + Number(e.lineTotal ?? e.price * e.quantity).toFixed(2),
+        }))
         this.total = snap.total
       })
       const snap = cartStore.snapshot()
-      this.entries = snap.entries
+      this.entries = (snap.entries || []).map((e) => ({
+        ...e,
+        priceLabel: '$' + Number(e.price).toFixed(2),
+        lineTotalLabel: '$' + Number(e.lineTotal ?? e.price * e.quantity).toFixed(2),
+      }))
       this.total = snap.total
 
       this.$watch('open', (val) => {
@@ -163,28 +171,34 @@ export default Blits.Component('CartPanel', {
     },
   },
   methods: {
+    // PUBLIC_INTERFACE
     $rowY(i) {
+      /** Row Y position for an entry in the cart list. */
       return i * 80
     },
-    $formatPrice(p) {
-      return '$' + Number(p).toFixed(2)
-    },
-    $formatTotal(p, q) {
-      return '$' + (Number(p) * Number(q)).toFixed(2)
-    },
+    // PUBLIC_INTERFACE
     $inc(item) {
+      /** Increase quantity for an entry. */
       cartStore.update(item.id, item.quantity + 1)
     },
+    // PUBLIC_INTERFACE
     $dec(item) {
+      /** Decrease quantity for an entry (removes if zero). */
       cartStore.update(item.id, item.quantity - 1)
     },
+    // PUBLIC_INTERFACE
     $remove(item) {
+      /** Remove an entry from the cart. */
       cartStore.remove(item.id)
     },
+    // PUBLIC_INTERFACE
     $clear() {
+      /** Clear all items from the cart. */
       cartStore.clear()
     },
+    // PUBLIC_INTERFACE
     $checkout() {
+      /** Simulate checkout by clearing cart and showing confirmation overlay. */
       const snap = cartStore.snapshot()
       if (snap.count === 0) return
       cartStore.clear()
@@ -192,7 +206,9 @@ export default Blits.Component('CartPanel', {
       this.confirmAlpha = 0
       this.$nextTick(() => (this.confirmAlpha = 1))
     },
+    // PUBLIC_INTERFACE
     $closeConfirm() {
+      /** Close confirmation overlay with brief fade-out. */
       this.confirmAlpha = 0
       this.$setTimeout(() => (this.showConfirm = false), 220)
     },

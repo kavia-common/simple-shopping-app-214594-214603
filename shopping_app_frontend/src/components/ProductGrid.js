@@ -37,7 +37,7 @@ export default Blits.Component('ProductGrid', {
   },
   computed: {
     flatProducts() {
-      return this.products || []
+      return Array.isArray(this.products) ? this.products : []
     },
   },
   methods: {

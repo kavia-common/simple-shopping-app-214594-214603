@@ -5,14 +5,17 @@ import { Theme } from './theme.js'
 export default Blits.Application({
   template: `
     <Element w="1920" h="1080">
-      <Rect w="1920" h="1080" :color="$bgGradient" />
+      <!-- Bind precomputed background color object; avoid inline object literal -->
+      <Rect w="1920" h="1080" :color="$backgroundColor" />
       <RouterView />
     </Element>
   `,
   state() {
     return {
-      bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
+      // Precompute gradient object in state to avoid inline literal in template bindings
+      backgroundColor: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
     }
   },
+  // Ensure default route renders Shop page
   routes: [{ path: '/', component: Shop }],
 })

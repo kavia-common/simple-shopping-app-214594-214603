@@ -41,7 +41,7 @@ export default Blits.Component('Header', {
   computed: {
     itemsLabel() {
       const n = Number(this.count || 0)
-      return ` ${n} items`
+      return `${n} items`
     },
     totalLabel() {
       const t = Number(this.total || 0)

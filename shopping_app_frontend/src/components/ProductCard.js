@@ -96,14 +96,20 @@ export default Blits.Component('ProductCard', {
     },
   },
   methods: {
+    // PUBLIC_INTERFACE
     $increment() {
+      /** Increment selected quantity up to product stock or 99. */
       const max = this.product?.stock ?? 99
       if (this.qty < max) this.qty += 1
     },
+    // PUBLIC_INTERFACE
     $decrement() {
+      /** Decrement selected quantity, minimum 1. */
       if (this.qty > 1) this.qty -= 1
     },
+    // PUBLIC_INTERFACE
     $addToCart() {
+      /** Add current product and quantity to cart and trigger a brief visual alpha feedback. */
       if (!this.product) return
       cartStore.add(this.product, this.qty)
       this.alpha = 0.75

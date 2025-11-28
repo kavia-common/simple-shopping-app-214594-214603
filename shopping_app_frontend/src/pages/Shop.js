@@ -27,12 +27,14 @@ export default Blits.Component('Shop', {
   `,
   state() {
     return {
-      // UI theme bindings (avoid inline object literals in template)
+      // Theme-bound colors (avoid inline literals in template)
       backgroundColor: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
       surfaceColor: Theme.colors.surface,
       primaryColor: Theme.colors.primary,
-      surfaceRadiusEffect: [this.$shader('radius', { radius: Theme.radii.xl })],
-      pillRadiusEffect: [this.$shader('radius', { radius: 999 })],
+
+      // Place effect arrays in state (created in ready to access this.$shader)
+      surfaceRadiusEffect: null,
+      pillRadiusEffect: null,
 
       products,
       count: 0,
@@ -44,6 +46,10 @@ export default Blits.Component('Shop', {
   },
   hooks: {
     ready() {
+      // Create shader arrays when component is ready
+      this.surfaceRadiusEffect = [this.$shader('radius', { radius: Theme.radii.xl })]
+      this.pillRadiusEffect = [this.$shader('radius', { radius: 999 })]
+
       // subscribe to cart
       this.unsubscribe = cartStore.subscribe((snap) => {
         this.count = snap.count
