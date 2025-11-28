@@ -4,7 +4,8 @@ import { Theme } from './theme.js'
 
 export default Blits.Application({
   template: `
-    <Element w="1920" h="1080" :color="$bgGradient">
+    <Element w="1920" h="1080">
+      <Rect w="1920" h="1080" :color="$bgGradient" />
       <RouterView />
     </Element>
   `,

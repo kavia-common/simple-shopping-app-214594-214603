@@ -9,7 +9,7 @@ import { cartStore } from '../store/cart.js'
 export default Blits.Component('Shop', {
   components: { Header, ProductGrid, CartPanel },
   template: `
-    <Element w="1920" h="1080" :color="$bgGradient">
+    <Element w="1920" h="1080">
       <Rect w="1920" h="1080" :color="$backgroundColor" />
       <Header :count="$count" :total="$total" />
       <Element x="40" y="120" :effects="$surfaceRadiusEffect">
@@ -19,7 +19,7 @@ export default Blits.Component('Shop', {
         </Element>
       </Element>
       <CartPanel :open="$cartOpen" />
-      <Element mount="{x:1}" x="1880" y="100" :effects="$pillRadiusEffect" @enter="$toggleCart">
+      <Element :mount="$mountRight" x="1880" y="100" :effects="$pillRadiusEffect" @enter="$toggleCart">
         <Rect w="44" h="44" :color="$primaryColor" />
         <Text x="10" y="8" size="26" color="#fff" content="🛒" />
       </Element>
@@ -28,8 +28,7 @@ export default Blits.Component('Shop', {
   state() {
     return {
       // UI theme bindings (avoid inline object literals in template)
-      bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
-      backgroundColor: Theme.colors.background,
+      backgroundColor: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
       surfaceColor: Theme.colors.surface,
       primaryColor: Theme.colors.primary,
       surfaceRadiusEffect: [this.$shader('radius', { radius: Theme.radii.xl })],
@@ -39,6 +38,8 @@ export default Blits.Component('Shop', {
       count: 0,
       total: 0,
       cartOpen: false,
+
+      mountRight: 'x:1',
     }
   },
   hooks: {

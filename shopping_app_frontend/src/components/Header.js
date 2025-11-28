@@ -9,7 +9,7 @@ export default Blits.Component('Header', {
       <Element x="40" y="28">
         <Text size="40" :color="$textColor" content="Ocean Shop" />
       </Element>
-      <Element mount="{x: 1}" :x="$wMinus40" y="20" w="420" h="56" :effects="$radiusLg">
+      <Element :mount="$mountRight" :x="$wMinus40" y="20" w="420" h="56" :effects="$radiusLg">
         <Rect w="420" h="56" :color="$surfaceColor" :shadow="$shadowSm" />
         <Element x="20" y="14">
           <Text size="28" :color="$mutedText" content="Cart:" />
@@ -17,7 +17,7 @@ export default Blits.Component('Header', {
         <Element x="110" y="14">
           <Text size="28" :color="$textColor" :content="$itemsLabel"/>
         </Element>
-        <Element mount="{x: 1}" x="400" y="14">
+        <Element :mount="$mountRight" x="400" y="14">
           <Text size="28" :color="$primaryColor" :content="$totalLabel"/>
         </Element>
       </Element>
@@ -34,16 +34,18 @@ export default Blits.Component('Header', {
       bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
       shadowSm: { blur: Theme.elevation.sm, color: Theme.colors.shadow, spread: 0 },
       radiusLg: [this.$shader('radius', { radius: Theme.radii.lg })],
-      count: 0,
-      total: 0,
+
+      mountRight: 'x:1',
     }
   },
   computed: {
     itemsLabel() {
-      return ` ${this.count} items`
+      const n = Number(this.count || 0)
+      return ` ${n} items`
     },
     totalLabel() {
-      return `$${this.total.toFixed(2)}`
+      const t = Number(this.total || 0)
+      return `$${t.toFixed(2)}`
     },
   },
 })

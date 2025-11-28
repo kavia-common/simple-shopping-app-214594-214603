@@ -6,11 +6,11 @@ export default Blits.Component('ProductGrid', {
   props: ['products'],
   template: `
     <Element :w="$w" :h="$h">
-      <For :each="$rowsArr" let="index">
-        <Element :y="$rowY(index)">
+      <For :each="$rowsArr" let="row">
+        <Element :y="$rowY(row)">
           <For :each="$colsArr" let="col">
             <Element :x="$colX(col)">
-              <ProductCard :product="$flatProducts[$flatIndex(index, col)]" />
+              <ProductCard :product="$productAt(row, col)" />
             </Element>
           </For>
         </Element>
@@ -41,8 +41,12 @@ export default Blits.Component('ProductGrid', {
     },
   },
   methods: {
-    $flatIndex(r, c) {
+    $index(r, c) {
       return r * this.cols + c
+    },
+    $productAt(r, c) {
+      const idx = this.$index(r, c)
+      return this.flatProducts[idx] || null
     },
     $rowY(rIndex) {
       return rIndex * (this.rowH + this.gap)

@@ -5,40 +5,42 @@ import { cartStore } from '../store/cart.js'
 export default Blits.Component('CartPanel', {
   props: ['open'],
   template: `
-    <Element :w="$panelW" :h="$panelH" :x.transition="$slideTransitionValue">
+    <Element :w="$panelW" :h="$panelH" :x.transition="$slideX">
       <Rect :w="$panelW" :h="$panelH" :color="$surfaceColor" :shadow="$shadowLgRef" />
       <Element x="20" y="16">
         <Text size="30" :color="$textColor" content="Your Cart" />
       </Element>
 
       <Element x="20" y="64" :h="$listH" :w="$listW">
-        <Element :for="(item, index) in $entries" :key="$item.id" :y="$rowY(index)" :effects="$radiusMdRef">
-          <Rect :w="$rowW" h="70" :color="$backgroundColor" />
-          <Image :src="$item.image" x="10" y="10" w="50" h="50" />
-          <Element x="70" y="12"><Text size="24" :color="$textColor" :content="$item.name"/></Element>
-          <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$formatPrice($item.price)"/></Element>
+        <For :each="$entries" let="i">
+          <Element :y="$rowY(i)" :effects="$radiusMdRef">
+            <Rect :w="$rowW" h="70" :color="$backgroundColor" />
+            <Image :src="$entries[i].image" x="10" y="10" w="50" h="50" />
+            <Element x="70" y="12"><Text size="24" :color="$textColor" :content="$entries[i].name"/></Element>
+            <Element x="70" y="40"><Text size="20" :color="$mutedText" :content="$formatPrice($entries[i].price)"/></Element>
 
-          <Element mount="$mountRight" :x="$qtyLeftX" y="18" :effects="$radiusSmRef">
-            <Rect w="32" h="32" :color="$errorColor" />
-            <Text x="9" y="5" size="24" color="#fff" content="-" @enter="$dec($item)"/>
-          </Element>
-          <Element mount="$mountRight" :x="$qtyCenterX" y="22">
-            <Text size="24" :color="$textColor" :content="$item.quantityString"/>
-          </Element>
-          <Element mount="$mountRight" :x="$qtyRightX" y="18" :effects="$radiusSmRef">
-            <Rect w="32" h="32" :color="$secondaryColor" />
-            <Text x="9" y="5" size="24" color="#fff" content="+" @enter="$inc($item)"/>
-          </Element>
+            <Element :mount="$mountRight" :x="$qtyLeftX" y="18" :effects="$radiusSmRef">
+              <Rect w="32" h="32" :color="$errorColor" />
+              <Text x="9" y="5" size="24" color="#fff" content="-" @enter="$dec($entries[i])"/>
+            </Element>
+            <Element :mount="$mountRight" :x="$qtyCenterX" y="22">
+              <Text size="24" :color="$textColor" :content="$entries[i].quantity"/>
+            </Element>
+            <Element :mount="$mountRight" :x="$qtyRightX" y="18" :effects="$radiusSmRef">
+              <Rect w="32" h="32" :color="$secondaryColor" />
+              <Text x="9" y="5" size="24" color="#fff" content="+" @enter="$inc($entries[i])"/>
+            </Element>
 
-          <Element mount="$mountRight" :x="$removeX" y="18" :effects="$radiusSmRef" @enter="$remove($item)">
-            <Rect w="32" h="32" :color="$errorColor" />
-            <Text x="6" y="5" size="22" color="#fff" content="x"/>
-          </Element>
+            <Element :mount="$mountRight" :x="$removeX" y="18" :effects="$radiusSmRef" @enter="$remove($entries[i])">
+              <Rect w="32" h="32" :color="$errorColor" />
+              <Text x="6" y="5" size="22" color="#fff" content="x"/>
+            </Element>
 
-          <Element mount="$mountRight" :x="$lineTotalX" y="48">
-            <Text size="20" :color="$primaryColor" :content="$formatTotal($item.price, $item.quantity)"/>
+            <Element :mount="$mountRight" :x="$lineTotalX" y="48">
+              <Text size="20" :color="$primaryColor" :content="$formatTotal($entries[i].price, $entries[i].quantity)"/>
+            </Element>
           </Element>
-        </Element>
+        </For>
       </Element>
 
       <Element :y="$footerY" x="20" :effects="$radiusMdRef">
@@ -47,21 +49,21 @@ export default Blits.Component('CartPanel', {
           <Rect w="140" h="28" :color="$errorColor" :effects="$radiusSmRef"/>
           <Text x="16" y="2" size="22" color="#fff" content="Clear Cart"/>
         </Element>
-        <Element mount="$mountRight" :x="$totalLabelX" y="14">
+        <Element :mount="$mountRight" :x="$totalLabelX" y="14">
           <Text size="24" :color="$mutedText" content="Total:"/>
         </Element>
-        <Element mount="$mountRight" :x="$totalValueX" y="14">
+        <Element :mount="$mountRight" :x="$totalValueX" y="14">
           <Text size="26" :color="$primaryColor" :content="$formattedTotal"/>
         </Element>
       </Element>
 
-      <Element :y="$checkoutY" mount="$mountRight" :x="$checkoutX" :effects="$radiusMdRef" @enter="$checkout">
+      <Element :y="$checkoutY" :mount="$mountRight" :x="$checkoutX" :effects="$radiusMdRef" @enter="$checkout">
         <Rect w="180" h="48" :color="$primaryColor" />
         <Text x="26" y="10" size="24" color="#fff" content="Checkout"/>
       </Element>
 
-      <Element v-if="$showConfirm" :w="$panelW" :h="$panelH" :color="$overlayColor" :alpha.transition="$confirmTransitionValue">
-        <Element :x="$centerX" :y="$centerY" mount="$mountCenter" :effects="$radiusLgRef">
+      <Element v-if="$showConfirm" :w="$panelW" :h="$panelH" :color="$overlayColor" :alpha.transition="$confirmAlpha">
+        <Element :x="$centerX" :y="$centerY" :mount="$mountCenter" :effects="$radiusLgRef">
           <Rect w="520" h="220" :color="$surfaceColor" :shadow="$shadowLgRef" />
           <Text x="36" y="36" size="28" :color="$textColor" content="Order Confirmed!" />
           <Text x="36" y="80" size="22" :color="$mutedText" content="Thank you for your purchase. A confirmation email would be sent in a real app." />
@@ -83,7 +85,7 @@ export default Blits.Component('CartPanel', {
       entries: [],
       total: 0,
       showConfirm: false,
-      confirmAlpha: 0,
+
 
       // theme bindings
       surfaceColor: Theme.colors.surface,
@@ -122,11 +124,11 @@ export default Blits.Component('CartPanel', {
       centerX: panelW / 2,
       centerY: panelH / 2,
 
-      // transitions (as primitive refs for .transition)
-      slideTransitionValue: 1920,
-      confirmTransitionValue: 0,
+      // transitions (primitive state fields)
+      slideX: 1920,
+      confirmAlpha: 0,
 
-      // mount shortcuts to avoid inline object literals in template
+      // mount strings referenced via :mount
       mountRight: 'x:1',
       mountCenter: 'x:0.5,y:0.5',
     }
@@ -145,10 +147,10 @@ export default Blits.Component('CartPanel', {
       const snap = cartStore.snapshot()
       this.entries = snap.entries
       this.total = snap.total
+
       this.$watch('open', (val) => {
         this.x = val ? 1920 - this.panelW - 20 : 1920 + 20
-        // update slide transition target value (primitive used by :x.transition)
-        this.slideTransitionValue = this.x
+        this.slideX = this.x
       })
     },
     detach() {
@@ -161,7 +163,6 @@ export default Blits.Component('CartPanel', {
     },
   },
   methods: {
-    // row y based on index passed from template to avoid relying on $index magic in precompiler
     $rowY(i) {
       return i * 80
     },
@@ -189,11 +190,10 @@ export default Blits.Component('CartPanel', {
       cartStore.clear()
       this.showConfirm = true
       this.confirmAlpha = 0
-      // drive transition primitive value
-      this.$nextTick(() => (this.confirmTransitionValue = 1))
+      this.$nextTick(() => (this.confirmAlpha = 1))
     },
     $closeConfirm() {
-      this.confirmTransitionValue = 0
+      this.confirmAlpha = 0
       this.$setTimeout(() => (this.showConfirm = false), 220)
     },
   },
