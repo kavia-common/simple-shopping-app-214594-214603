@@ -1,12 +1,17 @@
 import Blits from '@lightningjs/blits'
-
-import Home from './pages/Home.js'
+import Shop from './pages/Shop.js'
+import { Theme } from './theme.js'
 
 export default Blits.Application({
   template: `
-    <Element>
+    <Element w="1920" h="1080" :color="$bgGradient">
       <RouterView />
     </Element>
   `,
-  routes: [{ path: '/', component: Home }],
+  state() {
+    return {
+      bgGradient: { top: Theme.colors.gradientTop, bottom: Theme.colors.gradientBottom },
+    }
+  },
+  routes: [{ path: '/', component: Shop }],
 })
