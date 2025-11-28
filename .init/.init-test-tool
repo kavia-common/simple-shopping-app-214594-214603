@@ -1,0 +1,4 @@
+{
+    "command": "npm run build",
+    "working_directory": "/home/kavia/workspace/code-generation/simple-shopping-app-214594-214603/shopping_app_frontend"
+}
